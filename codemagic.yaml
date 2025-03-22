@@ -1,0 +1,30 @@
+workflows:
+  ios-workflow:
+    name: iOS Build
+    instance_type: mac_mini_m1
+    max_build_duration: 60
+    environment:
+      vars:
+        XCODE_WORKSPACE: "NFCPassportReader.xcodeproj"  # Đặt đúng workspace nếu có
+        XCODE_SCHEME: "NFCPassportReader"  # Scheme của dự án
+      xcode: latest
+    scripts:
+      - name: Install dependencies
+        script: |
+          brew install swiftlint
+          gem install cocoapods
+          pod install
+      - name: Build app
+        script: |
+          xcodebuild clean build \
+          -project "$XCODE_WORKSPACE" \
+          -scheme "$XCODE_SCHEME" \
+          -destination 'generic/platform=iOS' \
+          CODE_SIGNING_ALLOWED=NO
+    artifacts:
+      - build/**/Products/*.app
+      - build/**/Products/*.ipa
+    publishing:
+      email:
+        recipients:
+          - "your-email@example.com"
